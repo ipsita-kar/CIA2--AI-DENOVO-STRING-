@@ -1,0 +1,57 @@
+def merge_substrings(substrings):
+    def needleman_wunsch(s1, s2):
+        m = len(s1)
+        n = len(s2)
+        dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+        for i in range(m + 1):
+            for j in range(n + 1):
+                if i == 0 or j == 0:
+                    dp[i][j] = i + j
+                elif s1[i - 1] == s2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1]
+                else:
+                    dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1])
+
+        i, j = m, n
+        result = []
+        while i > 0 and j > 0:
+            if s1[i - 1] == s2[j - 1]:
+                result.append(s1[i - 1])
+                i -= 1
+                j -= 1
+            elif dp[i - 1][j] < dp[i][j - 1]:
+                result.append(s1[i - 1])
+                i -= 1
+            else:
+                result.append(s2[j - 1])
+                j -= 1
+
+        while i > 0:
+            result.append(s1[i - 1])
+            i -= 1
+        while j > 0:
+            result.append(s2[j - 1])
+            j -= 1
+
+        return ''.join(result[::-1])
+
+    # Initial merge using Needleman-Wunsch algorithm
+    merged = substrings[0]
+    for i in range(1, len(substrings)):
+        merged = needleman_wunsch(merged, substrings[i])
+
+    return merged
+
+# Get user input for substrings
+given_substrings = []
+print("Enter substrings (type 'done' when finished):")
+while True:
+    substring = input("Enter substring: ")
+    if substring.lower() == 'done':
+        break
+    given_substrings.append(substring)
+
+# Merge substrings to create a meaningful word
+result = merge_substrings(given_substrings)
+print("Constructed word:", result)
